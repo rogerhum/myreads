@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import * as BooksAPI from './BooksAPI';
+// import * as BooksAPI from './BooksAPI';
 import Shelf from './Shelf';
 
 class ListBooks extends Component {
@@ -9,37 +9,10 @@ class ListBooks extends Component {
             {id: 'currentlyReading', title: 'Currently Reading'},
             {id: 'wantToRead', title: 'Want to Read'},
             {id: 'read', title: 'Read'}
-        ],
-        books: []
-    };
-    componentDidMount() {
-        BooksAPI.getAll().then(books => {
-            console.log(books);
-            this.setState({books});
-        });
-    }
-    updateBook = (book, shelf) => {
-        this.setState(prevState => {
-            if (shelf === 'none') {
-                return {
-                    books: prevState.books.filter(
-                        currentBook => currentBook.id !== book.id
-                    )
-                };
-            }
-            return {
-                books: prevState.books.map(currentBook => {
-                    if (currentBook.id === book.id) {
-                        currentBook.shelf = shelf;
-                    }
-                    return currentBook;
-                })
-            };
-        });
-        BooksAPI.update(book, shelf);
+        ]
     };
     getBooksForShelf = shelf => {
-        return this.state.books.filter(book => shelf.id === book.shelf);
+        return this.props.books.filter(book => shelf.id === book.shelf);
     };
 
     render() {
@@ -50,10 +23,7 @@ class ListBooks extends Component {
                 </div>
                 <div className="list-books-content">
                     <div>
-
-                        {this.state.shelves.map(shelf => <Shelf key={shelf.id} shelf={shelf}
-                                                                books={this.getBooksForShelf(shelf)}
-                                                                updateBook={this.updateBook}/>)}
+                        {this.state.shelves.map(shelf => <Shelf key={shelf.id} shelf={shelf} books={this.getBooksForShelf(shelf)} updateBook={this.props.updateBook}/>)}
                     </div>
                 </div>
                 <div className="open-search">

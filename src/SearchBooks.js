@@ -8,16 +8,28 @@ class SearchBooks extends Component {
         books: []
     };
     updateQuery = query => {
-        this.setState({ query: query.trim() });
+        this.setState({ query });
         this.searchBooks(query);
     };
     searchBooks = query => {
         BooksAPI.search(query, 20).then(books => {
-            if (!books.error) {
-                return this.setState({ books });
+            if (Array.isArray(books)) {
+                this.setBookShelves(books);
             }
         });
     };
+    setBookShelves(books) {
+        const correctlyShelvedBooks = books.map(searchBook => {
+            const myBook = this.props.books.filter(
+                propBook => propBook.id === searchBook.id
+            )[0];
+            if (myBook) {
+                searchBook.shelf = myBook.shelf;
+            }
+            return searchBook;
+        });
+        this.setState({ books: correctlyShelvedBooks });
+    }
     render() {
         return (
             <div className="search-books">
@@ -33,7 +45,9 @@ class SearchBooks extends Component {
                 </div>
                 <div className="search-books-results">
                     <ol className="books-grid">
-                        {this.state.books.map(book => <Book key={book.id} book={book} />)}
+                        {this.state.books.map(book =>
+                            <Book key={book.id} book={book} onShelfChange={this.props.updateBook}/>
+                        )}
                     </ol>
                 </div>
             </div>
