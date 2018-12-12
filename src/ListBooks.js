@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import * as BooksAPI from './BooksAPI';
 import Shelf from './Shelf';
+
 class ListBooks extends Component {
     state = {
         shelves: [
-            { id: 'currentlyReading', title: 'Currently Reading' },
-            { id: 'wantToRead', title: 'Want to Read' },
-            { id: 'read', title: 'Read' }
+            {id: 'currentlyReading', title: 'Currently Reading'},
+            {id: 'wantToRead', title: 'Want to Read'},
+            {id: 'read', title: 'Read'}
         ],
         books: []
     };
@@ -18,26 +19,24 @@ class ListBooks extends Component {
         });
     }
     updateBook = (book, shelf) => {
-        BooksAPI.update(book, shelf).then(data => {
-            console.log(data);
-            this.setState(prevState => {
-                if (shelf === 'none') {
-                    return {
-                        books: prevState.books.filter(
-                            currentBook => currentBook.id !== book.id
-                        )
-                    };
-                }
+        this.setState(prevState => {
+            if (shelf === 'none') {
                 return {
-                    books: prevState.books.map(currentBook => {
-                        if (currentBook.id === book.id) {
-                            currentBook.shelf = shelf;
-                        }
-                        return currentBook;
-                    })
+                    books: prevState.books.filter(
+                        currentBook => currentBook.id !== book.id
+                    )
                 };
-            });
+            }
+            return {
+                books: prevState.books.map(currentBook => {
+                    if (currentBook.id === book.id) {
+                        currentBook.shelf = shelf;
+                    }
+                    return currentBook;
+                })
+            };
         });
+        BooksAPI.update(book, shelf);
     };
     getBooksForShelf = shelf => {
         return this.state.books.filter(book => shelf.id === book.shelf);
@@ -52,7 +51,9 @@ class ListBooks extends Component {
                 <div className="list-books-content">
                     <div>
 
-                        {this.state.shelves.map(shelf => <Shelf key={shelf.id} shelf={shelf} books={this.getBooksForShelf(shelf)} updateBook={this.updateBook} /> )}
+                        {this.state.shelves.map(shelf => <Shelf key={shelf.id} shelf={shelf}
+                                                                books={this.getBooksForShelf(shelf)}
+                                                                updateBook={this.updateBook}/>)}
                     </div>
                 </div>
                 <div className="open-search">
@@ -62,4 +63,5 @@ class ListBooks extends Component {
         );
     }
 }
+
 export default ListBooks;
