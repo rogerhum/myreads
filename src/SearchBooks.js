@@ -7,29 +7,43 @@ class SearchBooks extends Component {
         query: '',
         books: []
     };
+    componentWillReceiveProps(nextProps) {
+        if (this.state.books.length > 0 && nextProps.books.length > 0) {
+            this.setBookShelves(this.state.books, nextProps.books);
+        }
+    }
     updateQuery = query => {
         this.setState({ query });
         this.searchBooks(query);
     };
     searchBooks = query => {
-        BooksAPI.search(query, 20).then(books => {
-            if (Array.isArray(books)) {
-                this.setBookShelves(books);
-            }
-        });
+        if (query === '') {
+            this.setState({ books: [] });
+        } else {
+            BooksAPI.search(query, 20).then(books => {
+                if (Array.isArray(books)) {
+                    this.setBookShelves(books, this.props.books);
+                }
+            });
+        }
     };
-    setBookShelves(books) {
-        const correctlyShelvedBooks = books.map(searchBook => {
-            const myBook = this.props.books.filter(
+    setBookShelves = (searchBooks, myBooks) => {
+        const correctlyShelvedBooks = searchBooks.map(searchBook => {
+            const myBook = myBooks.filter(
                 propBook => propBook.id === searchBook.id
             )[0];
             if (myBook) {
                 searchBook.shelf = myBook.shelf;
+            }else {
+                searchBook.shelf = 'none';
+
             }
             return searchBook;
         });
-        this.setState({ books: correctlyShelvedBooks });
-    }
+        if (this.state.books !== correctlyShelvedBooks) {
+            this.setState({ books: correctlyShelvedBooks });
+        }
+    };
     render() {
         return (
             <div className="search-books">
